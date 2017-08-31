@@ -10,7 +10,7 @@ USER = pwd.getpwduid(os.getuid())[0]
 PATH = "/home/" + USER + "/passdmgr/"
 PATTERN = r'(\/)+'
 
-def new(parent):
+def new():
     reg = re.split(PATTERN, sys.argv[2])
     path_ = "".join(reg[:-1])
     file_ = reg[-1]
@@ -26,7 +26,35 @@ def new(parent):
         new_file.touch()
     except FileExistsError:
         print("ERROR: File '" + file_ + "' already exists.\n \
-               Type 'passdmgr help' for help.")
+               Type 'passwdmgr help' for help.")
+        return 0
+
+def insert():
+    try:
+        file_ = open(PATH + sys.argv[2], "r+")
+    except IsADirectoryError:
+        print("ERROR: '" + sys.argv[2] + "' is a directory, not file")
+        return 0
+
+    lines = file_.readlines()
+    try:
+        for lines in lines:
+            file_.write(sys.argv[3])
+    except IndexError:
+        print("ERROR: Password not given.\n \
+               Command is 'passwdmgr insert <path> <password>'")
+        return 0
+
+def remove():
+    try:
+        os.remove(PATH + sys.argv[2])
+    except FileNotFoundError:
+        print("ERROR: No such file: '" + sys.argv[2] + "'")
+        return 0
+
+    # Removes the directory if it's empty
+    if not os.listdir(PATH + sys.argv[:-1]):
+        os.rmdir(PATH + sys.argv[:-1])
 
 def main():
     parent = Path(PATH)
@@ -51,6 +79,5 @@ def main():
     elif sys.argv[1] is "help":
         show_help()
 
-    return 1
 
 main()
