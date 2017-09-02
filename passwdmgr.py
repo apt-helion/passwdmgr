@@ -4,10 +4,8 @@ import os
 import pwd
 import re
 
-from pathlib import Path
-
-USER = pwd.getpwduid(os.getuid())[0]
-PATH = "/home/" + USER + "/passdmgr/"
+USER = pwd.getpwuid(os.getuid())[0]
+PATH = "/home/" + USER + "/passwdmgr/"
 PATTERN = r'(\/)+'
 
 def new():
@@ -15,69 +13,92 @@ def new():
     path_ = "".join(reg[:-1])
     file_ = reg[-1]
 
-    new_path = Path(PATH + path_)
-    try:
-        new_path.mkdir(parents=True)
-    except FileExistsError:
-        pass
+    if not os.path.exists(PATH + path_):
+        os.makedirs(PATH + path_)
+        print("Created the '%s' path." % (path_))
 
-    new_file = Path(PATH + path_ + file_)
-    try:
-        new_file.touch()
-    except FileExistsError:
-        print("ERROR: File '" + file_ + "' already exists.\n \
-               Type 'passwdmgr help' for help.")
+    if not os.path.exists(PATH + sys.argv[2]):
+        os.mknod(PATH + sys.argv[2])
+        print("Created file: '%s'." % (file_))
+    else:
+        print("ERROR: File '%s' already exists.\n" % (file_) + \
+              "Type 'passwdmgr help' for help.")
         return 0
 
 def insert():
     try:
         file_ = open(PATH + sys.argv[2], "r+")
     except IsADirectoryError:
-        print("ERROR: '" + sys.argv[2] + "' is a directory, not file")
+        print("ERROR: '%s' is a directory, not file." % (sys.argv[2]))
+        return 0
+    except FileNotFoundError:
+        print("ERROR: '%s' not found." % (sys.argv[2]))
         return 0
 
-    lines = file_.readlines()
     try:
-        for lines in lines:
-            file_.write(sys.argv[3])
+        output = sys.argv[3]
+        file_.truncate() # Delete previous lines
+        file_.write(output)
     except IndexError:
-        print("ERROR: Password not given.\n \
-               Command is 'passwdmgr insert <path> <password>'")
+        print("ERROR: Password not given.\n" + \
+              "Command is 'passwdmgr insert <path> <password>'.")
         return 0
 
 def remove():
+    reg = re.split(PATTERN, sys.argv[2])
+    path_ = "".join(reg[:-1])
+
     try:
         os.remove(PATH + sys.argv[2])
     except FileNotFoundError:
-        print("ERROR: No such file: '" + sys.argv[2] + "'")
+        print("ERROR: No such file: '%s'." % (sys.argv[2]))
         return 0
 
-    # Removes the directory if it's empty
-    if not os.listdir(PATH + sys.argv[:-1]):
-        os.rmdir(PATH + sys.argv[:-1])
+    # Ask to remove the directory if it's empty
+    if not os.listdir(PATH + path_):
+        userinput = input("The '%s' directory is empty" % (path_) + \
+                          "  - Do you want to remove it? (yes/no)\n> ")
+        if userinput.lower() is "yes" or "y":
+            os.rmdir(PATH + path_)
+            print("Removed empty directory '%s'." % (path_))
+
+def print_passwd():
+    try:
+        file_ = open(PATH + sys.argv[2], "r")
+    except IsADirectoryError:
+        print("ERROR: '%s' is a directory, not file." % (sys.argv[2]))
+        return 0
+    except FileNotFoundError:
+        print("ERROR: '%s' not found." % (sys.argv[2]))
+        return 0
+
+    password = "".join(file_.readlines())
+    print(password)
 
 def main():
-    parent = Path(PATH)
     if len(sys.argv) == 1:
-        try:
-            parent.mkdir()
-            print("'$HOME/password' directory not found...\n \
-                   Creating new directory...")
+        if not os.path.exists(PATH):
+            os.mkdir(PATH)
+            print("'$HOME/password' directory not found...\n" + \
+                  "Creating new directory...")
             return 1
-        except FileExistsError:
+        else:
             print_paths()
             return 1
 
-    if sys.argv[1] is "new":
+    if sys.argv[1] == "new":
         new()
-    elif sys.argv[1] is "insert":
+    elif sys.argv[1] == "insert":
         insert()
-    elif sys.argv[1] is "remove":
+    elif sys.argv[1] == "remove":
         remove()
-    elif sys.argv[1] is "print":
-        print_pwd()
-    elif sys.argv[1] is "help":
+    elif sys.argv[1] == "print":
+        print_passwd()
+    elif sys.argv[1] == "help":
         show_help()
+    else:
+        print("ERROR: Unknown argument '%s'\n" % (sys.argv[1]) + \
+              "Type 'passwdmgr help' for a list of commands.")
 
 
 main()
