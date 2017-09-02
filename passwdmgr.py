@@ -6,7 +6,7 @@ import os
 import re
 
 USER = pwd.getpwuid(os.getuid())[0]
-PATH = "/home/{}/passwdmgr/".format(USER)
+PATH = "/home/{}/.passwdmgr/".format(USER)
 PATTERN = r'(\/)+'
 
 def new():
@@ -169,7 +169,7 @@ def main():
     if len(sys.argv) == 1:
         if not os.path.exists(PATH):
             os.mkdir(PATH)
-            print("'$HOME/password' directory not found...\n" + \
+            print("'$HOME/.passwdmgr' directory not found...\n" + \
                   "Creating new directory...")
             return 1
         else:
