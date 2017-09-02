@@ -1,6 +1,4 @@
 # passwdmgr
-A very bad password manager (DO NOT USE THIS).
+A password manager for the linux terminal.
 
-TO-DOs:
--Finish
--Encrypt files
+Comming soon: Encryption

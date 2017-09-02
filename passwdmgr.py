@@ -119,7 +119,7 @@ def print_paths():
         level = root.replace(PATH, '').count(os.sep)
         indent = ' ' * 4 * (level)
         print("%s%s/" % (indent, os.path.basename(root)))
-        subindent = ((' ' * 4) + '|')  * (level + 1)
+        subindent = ('|' + (' ' * 3))  * (level + 1)
         for f in files:
             print("%s%s" % (subindent, f))
 
@@ -128,7 +128,7 @@ def search():
     for root, dirs, files in os.walk(PATH):
         level = root.replace(PATH, '').count(os.sep)
         indent = ' ' * 4 * (level)
-        subindent = ((' ' * 4) + '|') * (level + 1)
+        subindent = ('|' + (' ' * 3)) * (level + 1)
         for f in files:
             if re.search(pattern, f):
                 print("%s%s/" % (indent, os.path.basename(root)))
@@ -195,6 +195,5 @@ def main():
     else:
         print("ERROR: Unknown argument '%s'\n" % (sys.argv[1]) + \
               "Type 'passwdmgr help' for a list of commands.")
-
 
 main()
