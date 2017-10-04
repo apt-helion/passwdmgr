@@ -52,10 +52,10 @@ def insert():
         return 0
 
 def generate():
-    chars = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwYyXxZz!@#$%&"
+    chars = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwYyXxZz@#$%&"
     password = ""
     for i in range(0,16):
-        password += chars[random.randint(0,57)]
+        password += chars[random.randint(0,56)]
 
     try:
         file_ = open(PATH + sys.argv[2], "r+")
@@ -143,24 +143,24 @@ def show_help():
 +++++++++++++++++++++++++++++++++++
 
 Usage:
-    passwdmgr <new/add> [directory/file]
+    passwdmgr <new/add> [directory/file]...
         Creates a new password file.
         e.g 'passwdmgr new Email/gmail'
-    passwdmgr <insert> [directory/file] [password]
+    passwdmgr <insert> [directory/file] [password]...
         Adds a password to a file.
         e.g 'passwdmgr insert Business/site.com goodpassword'
-    passwdmgr <generate> [directory/file]
+    passwdmgr <generate> [directory/file]...
         Generates a random 16 character password into file
         e.g 'passwdmgr generate Email/hotmail.com'
     passwdmgr <remove/rm>
         Removes a file or directory.
         e.g 'passwdmgr rm Internet/reddit'
-    passwdmgr <print> [directory/file]
+    passwdmgr <print> [directory/file]...
         Prints a password from the file.
         e.g 'passwdmgr print Email/yahoo'
     passwdmgr <ls>
         Lists all files and folders.
-    passwdmgr <search/find> [filename]
+    passwdmgr <search/find> [filename]...
         Lists all files that match filename with regex.
         e.g 'passwdmgr search .com'
 """)
